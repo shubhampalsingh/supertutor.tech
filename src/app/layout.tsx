@@ -10,12 +10,12 @@ export const metadata: Metadata = {
   title: "SuperTutor — your fun AI tutor",
   description:
     "Learn anything with SuperTutor: a friendly AI tutor that guides you step by step, generates quizzes, solves photo problems, and builds flashcards. Free to try!",
-  metadataBase: new URL("https://supertutor.fun"),
+  metadataBase: new URL("https://supertutor.tech"),
   openGraph: {
     title: "SuperTutor — your fun AI tutor",
     description:
       "Chat with a friendly AI tutor, snap homework photos, take quizzes and master flashcards.",
-    url: "https://supertutor.fun",
+    url: "https://supertutor.tech",
     siteName: "SuperTutor",
   },
 };
@@ -31,7 +31,7 @@ export default function RootLayout({
         <Nav />
         <main className="mx-auto max-w-5xl px-4 pb-16">{children}</main>
         <footer className="mx-auto max-w-5xl px-4 pb-8 text-center text-sm text-ink/50">
-          <span className="display">SuperTutor</span> · supertutor.fun · learning
+          <span className="display">SuperTutor</span> · supertutor.tech · learning
           made fun 🎉
         </footer>
       </body>

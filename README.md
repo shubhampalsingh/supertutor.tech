@@ -1,4 +1,4 @@
-# 🦸 SuperTutor — supertutor.fun
+# 🦸 SuperTutor — supertutor.tech
 
 A playful AI tutor for students of every age, powered by Claude.
 
@@ -36,15 +36,15 @@ npm run dev                 # http://localhost:3000
 | `ANTHROPIC_FALLBACK_MODEL` | *(optional)* model the API retries on if the main model declines a request; defaults to `claude-opus-4-8` |
 | `DATABASE_URL` | Free Postgres from [Neon](https://neon.tech) (or Vercel Postgres / Supabase) |
 | `AUTH_SECRET` | `npx auth secret` or `openssl rand -base64 32` |
-| `AUTH_GOOGLE_ID` / `AUTH_GOOGLE_SECRET` | [Google Cloud Console](https://console.cloud.google.com/apis/credentials) → OAuth client (Web). Add redirect URIs: `https://supertutor.fun/api/auth/callback/google` and `http://localhost:3000/api/auth/callback/google` |
+| `AUTH_GOOGLE_ID` / `AUTH_GOOGLE_SECRET` | [Google Cloud Console](https://console.cloud.google.com/apis/credentials) → OAuth client (Web). Add redirect URIs: `https://supertutor.tech/api/auth/callback/google` and `http://localhost:3000/api/auth/callback/google` |
 
-## Deploy to Vercel + supertutor.fun
+## Deploy to Vercel + supertutor.tech
 
 1. Push this repo to GitHub and import it at https://vercel.com/new.
 2. Add all the environment variables above in Vercel → Project → Settings → Environment Variables.
 3. Deploy. The Prisma client is generated automatically on install.
 4. Run the schema against your production DB once: `npx prisma db push` (with the production `DATABASE_URL` in your shell), or use Neon's SQL editor.
-5. Point the domain: Vercel → Project → Settings → Domains → add `supertutor.fun`, then set the DNS records Vercel shows you at your registrar (usually an `A` record to `76.76.21.21` and `CNAME www → cname.vercel-dns.com`).
+5. Point the domain: Vercel → Project → Settings → Domains → add `supertutor.tech`, then set the DNS records Vercel shows you at your registrar (usually an `A` record to `76.76.21.21` and `CNAME www → cname.vercel-dns.com`).
 6. Update the Google OAuth redirect URI to the production domain.
 
 ## Agent architecture (Week 2 design → code)
