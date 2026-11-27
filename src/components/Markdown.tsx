@@ -31,7 +31,7 @@ export function Markdown({ text, onCite }: { text: string; onCite?: (ref: string
     if (h) {
       const size = h[1].length <= 2 ? "text-xl" : "text-lg";
       blocks.push(
-        <h3 key={key++} className={`${size} mt-4 mb-1 font-extrabold`}>
+        <h3 key={key++} className={`${size} mt-4 mb-1 font-semibold tracking-tight`}>
           {inline(h[2], onCite)}
         </h3>
       );
@@ -74,7 +74,7 @@ function inline(text: string, onCite?: (ref: string) => void): ReactNode {
     if (p.startsWith("**") && p.endsWith("**")) return <strong key={i}>{p.slice(2, -2)}</strong>;
     if (p.startsWith("`") && p.endsWith("`"))
       return (
-        <code key={i} className="rounded bg-grape/10 px-1 text-[0.9em]">
+        <code key={i} className="rounded bg-slate-100 px-1 text-[0.9em]">
           {p.slice(1, -1)}
         </code>
       );
@@ -87,7 +87,7 @@ function inline(text: string, onCite?: (ref: string) => void): ReactNode {
               key={r}
               type="button"
               onClick={() => onCite?.(r)}
-              className="mx-0.5 rounded-full bg-sky/15 px-1.5 text-xs font-bold text-sky hover:bg-sky/25"
+              className="mx-0.5 rounded-lg bg-sky/15 px-1.5 text-xs font-bold text-sky hover:bg-sky/25"
               title="Show source"
             >
               {r}

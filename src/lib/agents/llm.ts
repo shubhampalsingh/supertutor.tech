@@ -72,7 +72,7 @@ export function streamText(opts: {
           controller.enqueue(encoder.encode(full));
         }
       } catch {
-        controller.enqueue(encoder.encode("\n\n⚠️ Something went wrong. Please try again."));
+        controller.enqueue(encoder.encode("\n\nSomething went wrong. Please try again."));
       } finally {
         controller.close();
         if (full && opts.onDone) await Promise.resolve(opts.onDone(full)).catch(() => {});

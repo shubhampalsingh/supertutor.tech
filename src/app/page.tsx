@@ -1,104 +1,199 @@
 import Link from "next/link";
+import {
+  ArrowRight,
+  BookOpenCheck,
+  Camera,
+  FileText,
+  Layers,
+  ListChecks,
+  MessagesSquare,
+  Quote,
+  RefreshCw,
+  ShieldCheck,
+  Target,
+} from "lucide-react";
 
-const features = [
+const pillars = [
   {
-    href: "/plan",
-    emoji: "🗺️",
-    title: "Personal Learning Plan",
-    desc: "Set a goal and deadline, upload your notes, and get a roadmap that adapts as you learn — with lessons that cite your own materials.",
-    color: "from-sky-500/10 to-sky-500/5",
+    icon: Target,
+    title: "A plan built around your goal",
+    desc: "Enter what you need to learn, your current level, weekly hours and deadline. SuperTutor breaks it into topics in prerequisite order with clear objectives.",
   },
   {
-    href: "/tutor",
-    emoji: "💬",
-    title: "AI Chat Tutor",
-    desc: "A friendly tutor that guides you to the answer step by step — never just hands it over.",
-    color: "from-violet-500/10 to-violet-500/5",
+    icon: FileText,
+    title: "Grounded in your materials",
+    desc: "Upload lecture notes or readings as PDF or text. Explanations and quiz feedback cite the exact passage, so you can check every claim.",
   },
   {
-    href: "/solve",
-    emoji: "📸",
-    title: "Photo Solver",
-    desc: "Snap a photo of any homework problem and get a clear, numbered walkthrough.",
-    color: "from-pink-500/10 to-pink-500/5",
-  },
-  {
-    href: "/quiz",
-    emoji: "🎯",
-    title: "Quiz Me",
-    desc: "Instant practice quizzes on any topic, graded with friendly explanations.",
-    color: "from-amber-500/10 to-amber-500/5",
-  },
-  {
-    href: "/flashcards",
-    emoji: "🃏",
-    title: "Flashcards",
-    desc: "Auto-made flashcard decks with smart spaced repetition so it actually sticks.",
-    color: "from-emerald-500/10 to-emerald-500/5",
+    icon: RefreshCw,
+    title: "Adapts as you learn",
+    desc: "Quiz results update a mastery estimate per topic. Strong results move you on; recurring mistakes trigger a different explanation and scheduled revision.",
   },
 ];
 
+const steps = [
+  { n: "01", title: "Set a goal", desc: "Goal, level, time available and target date." },
+  { n: "02", title: "Add materials", desc: "Notes, slides as PDF, reading lists or a syllabus." },
+  { n: "03", title: "Learn and practise", desc: "Lessons with citations, then a short topic quiz." },
+  { n: "04", title: "Review gaps", desc: "Weak concepts and revision dates on your dashboard." },
+];
+
+const tools = [
+  { href: "/tutor", icon: MessagesSquare, title: "Tutor", desc: "Ask questions and work through problems with guided hints." },
+  { href: "/solve", icon: Camera, title: "Solve from a photo", desc: "Upload a problem and get a numbered, step-by-step walkthrough." },
+  { href: "/quiz", icon: ListChecks, title: "Practice quizzes", desc: "Multiple-choice questions on any topic, with explanations." },
+  { href: "/flashcards", icon: Layers, title: "Flashcards", desc: "Generated decks with spaced repetition scheduling." },
+];
+
+function ProductPreview() {
+  const topics = [
+    { t: "Variables and data types", m: 92, s: "Mastered", c: "text-mint bg-mint/10" },
+    { t: "Control flow and loops", m: 64, s: "Needs practice", c: "text-sunny bg-sunny/10" },
+    { t: "Functions and scope", m: 0, s: "Up next", c: "text-slate-600 bg-slate-100" },
+  ];
+  return (
+    <div className="card overflow-hidden" aria-hidden>
+      <div className="flex items-center justify-between border-b border-line px-5 py-3">
+        <div>
+          <div className="eyebrow">Study plan</div>
+          <div className="text-sm font-semibold">Python for data analysis</div>
+        </div>
+        <span className="rounded-md bg-slate-100 px-2 py-1 text-xs font-medium text-slate-600">1 of 6 mastered</span>
+      </div>
+      <ul className="divide-y divide-line">
+        {topics.map((x) => (
+          <li key={x.t} className="px-5 py-3.5">
+            <div className="flex items-center justify-between gap-3 text-sm">
+              <span className="font-medium">{x.t}</span>
+              <span className={`rounded-md px-2 py-0.5 text-xs font-medium ${x.c}`}>{x.s}</span>
+            </div>
+            <div className="mt-2 h-1.5 rounded-full bg-slate-100">
+              <div className="h-full rounded-full bg-brand" style={{ width: `${x.m}%` }} />
+            </div>
+          </li>
+        ))}
+      </ul>
+      <div className="border-t border-line bg-slate-50 px-5 py-4 text-sm">
+        <div className="flex items-start gap-2 text-slate-700">
+          <Quote className="mt-0.5 h-4 w-4 shrink-0 text-sky" />
+          <p>
+            A <span className="font-medium">for</span> loop repeats a block once per item in a sequence
+            <span className="ml-1 rounded bg-sky/10 px-1 text-xs font-semibold text-sky">S2</span>
+          </p>
+        </div>
+        <div className="mt-1.5 pl-6 text-xs text-slate-500">Lecture 3 notes, page 4</div>
+      </div>
+    </div>
+  );
+}
+
 export default function Home() {
   return (
-    <div className="pt-14 text-center">
-      <div className="animate-bounce-slow mx-auto mb-4 w-fit text-7xl">🦸</div>
-      <h1 className="mx-auto max-w-3xl text-5xl font-extrabold leading-tight sm:text-6xl">
-        Learning, but <span className="gradient-text">actually fun</span>
-      </h1>
-      <p className="mx-auto mt-4 max-w-xl text-lg text-ink/70">
-        SuperTutor is your personal AI tutor for every age and every subject.
-        Chat, snap homework photos, quiz yourself, and master flashcards — all
-        in one playful place.
-      </p>
-      <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-        <Link href="/tutor" className="btn-primary px-8 py-3 text-lg">
-          Start learning free →
-        </Link>
-        <Link
-          href="/solve"
-          className="rounded-full border-2 border-grape/30 bg-white px-8 py-3 text-lg font-bold text-grape hover:bg-grape/5"
-        >
-          📸 Solve a problem
-        </Link>
-      </div>
-      <p className="mt-3 text-sm text-ink/50">
-        No sign-up needed to try · Sign in with Google for bigger daily limits,
-        history & streaks
-      </p>
+    <div>
+      <section className="grid items-center gap-12 pt-16 pb-20 lg:grid-cols-[1.1fr_1fr] lg:pt-24">
+        <div>
+          <p className="eyebrow text-brand">Personal learning assistant</p>
+          <h1 className="mt-3 text-4xl font-semibold leading-[1.1] tracking-tight sm:text-5xl">
+            Study from your own course materials, with a plan that adapts to you.
+          </h1>
+          <p className="mt-5 max-w-xl text-lg leading-relaxed text-slate-600">
+            SuperTutor turns a learning goal into a structured plan, explains each topic using the notes you
+            upload, checks understanding with short quizzes, and decides what you should study next.
+          </p>
+          <div className="mt-8 flex flex-wrap gap-3">
+            <Link href="/plan" className="btn-primary inline-flex items-center gap-2 px-5 py-2.5">
+              Create a study plan <ArrowRight className="h-4 w-4" />
+            </Link>
+            <Link href="/tutor" className="btn-secondary inline-flex items-center px-5 py-2.5">
+              Try the tutor
+            </Link>
+          </div>
+          <p className="mt-4 text-sm text-slate-500">
+            The tutor works without an account. Sign in with Google to save plans, materials and progress.
+          </p>
+        </div>
+        <ProductPreview />
+      </section>
 
-      <div className="mt-14 grid gap-5 text-left sm:grid-cols-2">
-        {features.map((f) => (
-          <Link
-            key={f.href}
-            href={f.href}
-            className={`card group bg-gradient-to-br p-6 transition hover:-translate-y-1 hover:shadow-xl ${f.color}`}
-          >
-            <div className="text-4xl transition group-hover:scale-110">{f.emoji}</div>
-            <h2 className="mt-3 text-2xl font-bold">{f.title}</h2>
-            <p className="mt-1 text-ink/70">{f.desc}</p>
-          </Link>
-        ))}
-      </div>
+      <section className="border-t border-line py-16">
+        <div className="grid gap-8 md:grid-cols-3">
+          {pillars.map(({ icon: Icon, title, desc }) => (
+            <div key={title}>
+              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand/10 text-brand">
+                <Icon className="h-5 w-5" />
+              </span>
+              <h2 className="mt-4 text-lg font-semibold">{title}</h2>
+              <p className="mt-2 leading-relaxed text-slate-600">{desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
 
-      <div className="card mx-auto mt-14 max-w-2xl p-8">
-        <h2 className="text-3xl font-bold">
-          How it <span className="gradient-text">works</span>
-        </h2>
-        <ol className="mx-auto mt-5 max-w-md space-y-4 text-left text-ink/80">
-          <li className="flex gap-3">
-            <span className="text-2xl">1️⃣</span>
-            <span>Tell SuperTutor what you&apos;re learning (any subject, any grade).</span>
-          </li>
-          <li className="flex gap-3">
-            <span className="text-2xl">2️⃣</span>
-            <span>Get guided step by step — hints first, answers when you&apos;ve tried.</span>
-          </li>
-          <li className="flex gap-3">
-            <span className="text-2xl">3️⃣</span>
-            <span>Lock it in with quizzes and flashcards, and grow your streak 🔥</span>
-          </li>
+      <section className="border-t border-line py-16">
+        <h2 className="text-2xl font-semibold tracking-tight">How it works</h2>
+        <ol className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {steps.map((s) => (
+            <li key={s.n} className="card p-5">
+              <div className="font-mono text-sm text-slate-400">{s.n}</div>
+              <div className="mt-2 font-semibold">{s.title}</div>
+              <p className="mt-1 text-sm text-slate-600">{s.desc}</p>
+            </li>
+          ))}
         </ol>
-      </div>
+      </section>
+
+      <section className="border-t border-line py-16">
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <h2 className="text-2xl font-semibold tracking-tight">Study tools</h2>
+            <p className="mt-1 text-slate-600">Use them on their own, or alongside a study plan.</p>
+          </div>
+        </div>
+        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {tools.map(({ href, icon: Icon, title, desc }) => (
+            <Link key={href} href={href} className="card group p-5 transition-colors hover:border-slate-300">
+              <Icon className="h-5 w-5 text-slate-500 group-hover:text-brand" />
+              <div className="mt-3 font-semibold">{title}</div>
+              <p className="mt-1 text-sm text-slate-600">{desc}</p>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      <section className="border-t border-line py-16">
+        <div className="grid gap-8 md:grid-cols-2">
+          <div className="flex gap-4">
+            <ShieldCheck className="mt-1 h-6 w-6 shrink-0 text-mint" />
+            <div>
+              <h2 className="text-lg font-semibold">Transparent by design</h2>
+              <p className="mt-2 leading-relaxed text-slate-600">
+                Course-specific answers show their sources. When something isn&apos;t covered by your materials, the
+                tutor says so. You can report errors or ask for another explanation at any point.
+              </p>
+            </div>
+          </div>
+          <div className="flex gap-4">
+            <BookOpenCheck className="mt-1 h-6 w-6 shrink-0 text-brand" />
+            <div>
+              <h2 className="text-lg font-semibold">Supports learning, not shortcuts</h2>
+              <p className="mt-2 leading-relaxed text-slate-600">
+                For assessed work, SuperTutor focuses on explanation, practice and feedback. You stay in control of
+                your goals, schedule and uploaded files, and can delete them at any time.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="card mt-4 flex flex-col items-start justify-between gap-6 p-8 sm:flex-row sm:items-center">
+        <div>
+          <h2 className="text-xl font-semibold tracking-tight">Start with a goal</h2>
+          <p className="mt-1 text-slate-600">It takes about a minute to set up your first plan.</p>
+        </div>
+        <Link href="/plan" className="btn-primary inline-flex items-center gap-2 px-5 py-2.5">
+          Create a study plan <ArrowRight className="h-4 w-4" />
+        </Link>
+      </section>
     </div>
   );
 }

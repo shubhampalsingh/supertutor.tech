@@ -1,27 +1,34 @@
 import Link from "next/link";
 import Image from "next/image";
+import { ChartColumn, GraduationCap, LogOut } from "lucide-react";
 import { auth, signIn, signOut } from "@/lib/auth";
+import { NavLinks } from "@/components/NavLinks";
 
 export async function Nav() {
   const session = await auth();
 
   return (
-    <nav className="sticky top-0 z-20 border-b-2 border-grape/10 bg-cream/80 backdrop-blur">
-      <div className="mx-auto flex max-w-5xl items-center gap-1 overflow-x-auto whitespace-nowrap px-4 py-3 text-sm font-bold sm:gap-2">
-        <Link href="/" className="display mr-2 flex shrink-0 items-center gap-1 text-xl">
-          <span className="animate-bounce-slow inline-block">🦸</span>
-          <span className="gradient-text hidden sm:inline">SuperTutor</span>
+    <header className="sticky top-0 z-20 border-b border-line bg-white/90 backdrop-blur">
+      <div className="mx-auto flex h-14 max-w-6xl items-center gap-1 overflow-x-auto whitespace-nowrap px-4 sm:gap-2 sm:px-6">
+        <Link href="/" className="mr-2 flex shrink-0 items-center gap-2 font-semibold tracking-tight sm:mr-4">
+          <span className="flex h-7 w-7 items-center justify-center rounded-md bg-brand text-white">
+            <GraduationCap className="h-4 w-4" aria-hidden />
+          </span>
+          <span className="hidden sm:inline">SuperTutor</span>
         </Link>
-        <Link href="/plan" className="rounded-full px-2 py-1.5 hover:bg-grape/10 sm:px-3">🗺️ Plan</Link>
-        <Link href="/tutor" className="rounded-full px-2 py-1.5 hover:bg-grape/10 sm:px-3">💬 Tutor</Link>
-        <Link href="/solve" className="rounded-full px-2 py-1.5 hover:bg-grape/10 sm:px-3">📸 Solve</Link>
-        <Link href="/quiz" className="rounded-full px-2 py-1.5 hover:bg-grape/10 sm:px-3">🎯 Quiz</Link>
-        <Link href="/flashcards" className="rounded-full px-2 py-1.5 hover:bg-grape/10 sm:px-3">🃏 Cards</Link>
-        <div className="ml-auto flex items-center gap-2">
+        <nav className="flex items-center gap-0.5">
+          <NavLinks />
+        </nav>
+        <div className="ml-auto flex shrink-0 items-center gap-2 pl-2">
           {session?.user ? (
             <>
-              <Link href="/dashboard" className="rounded-full px-2 py-1.5 hover:bg-grape/10 sm:px-3">
-                📊 <span className="hidden sm:inline">Progress</span>
+              <Link
+                href="/dashboard"
+                aria-label="Progress"
+                className="flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-ink"
+              >
+                <ChartColumn className="h-4 w-4 md:hidden" aria-hidden />
+                <span className="hidden md:inline">Progress</span>
               </Link>
               {session.user.image && (
                 <Image
@@ -29,7 +36,7 @@ export async function Nav() {
                   alt=""
                   width={28}
                   height={28}
-                  className="rounded-full border-2 border-grape/30"
+                  className="hidden rounded-full border border-line sm:block"
                 />
               )}
               <form
@@ -38,8 +45,12 @@ export async function Nav() {
                   await signOut({ redirectTo: "/" });
                 }}
               >
-                <button className="rounded-full px-2 py-1.5 text-ink/60 hover:bg-grape/10">
-                  Sign out
+                <button
+                  aria-label="Sign out"
+                  className="flex items-center rounded-md px-2.5 py-1.5 text-sm font-medium text-slate-500 hover:bg-slate-50 hover:text-ink"
+                >
+                  <LogOut className="h-4 w-4 md:hidden" aria-hidden />
+                  <span className="hidden md:inline">Sign out</span>
                 </button>
               </form>
             </>
@@ -50,11 +61,11 @@ export async function Nav() {
                 await signIn("google");
               }}
             >
-              <button className="btn-primary px-4 py-1.5">Sign in</button>
+              <button className="btn-primary px-3.5 py-1.5 text-sm">Sign in</button>
             </form>
           )}
         </div>
       </div>
-    </nav>
+    </header>
   );
 }

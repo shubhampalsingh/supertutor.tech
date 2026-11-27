@@ -54,8 +54,8 @@ export async function POST(req: NextRequest) {
     return Response.json(
       {
         error: userId
-          ? "You've reached today's flashcard limit. Come back tomorrow! 🌙"
-          : "Guest limit reached — sign in with Google to make more decks!",
+          ? "You've reached today's flashcard limit. It resets at midnight UTC."
+          : "You have used the guest limit. Sign in with Google to continue.",
         limitReached: true,
       },
       { status: 429 }
@@ -84,7 +84,7 @@ export async function POST(req: NextRequest) {
   });
 
   if (response.stop_reason === "refusal") {
-    return Response.json({ error: "That topic isn't something I can make cards for. Try another!" }, { status: 400 });
+    return Response.json({ error: "That topic isn't something I can make cards for. Please try a different topic." }, { status: 400 });
   }
 
   const text = response.content.find((b) => b.type === "text")?.text ?? "";

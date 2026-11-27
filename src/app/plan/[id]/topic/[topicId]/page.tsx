@@ -4,6 +4,7 @@ import { use, useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Markdown } from "@/components/Markdown";
+import { ArrowRight, ChevronLeft, Flag, HelpCircle, ThumbsUp, X } from "lucide-react";
 
 type Source = { ref: string; title: string; page: number | null; snippet: string };
 type Msg = { role: "user" | "assistant"; content: string; sources?: Source[] };
@@ -41,24 +42,28 @@ export default function TopicPage({
   }
 
   return (
-    <div className="mx-auto max-w-3xl pt-8">
-      <Link href={`/plan/${id}`} className="text-sm font-bold text-grape">
-        ← {goal || "Back to plan"}
+    <div className="mx-auto max-w-3xl">
+      <div className="border-b border-line pt-8">
+      <Link href={`/plan/${id}`} className="inline-flex max-w-full items-center gap-1 truncate text-sm text-slate-500 hover:text-ink">
+        <ChevronLeft className="h-4 w-4 shrink-0" /> <span className="truncate">{goal || "Back to plan"}</span>
       </Link>
-      <h1 className="mt-2 text-3xl font-extrabold">{topic?.title ?? "…"}</h1>
-      {topic && <p className="mt-1 text-ink/60">{topic.summary}</p>}
-      <div className="mt-4 flex gap-2">
+      <h1 className="mt-3 text-2xl font-semibold tracking-tight sm:text-3xl">{topic?.title ?? "…"}</h1>
+      {topic && <p className="mt-2 text-slate-600">{topic.summary}</p>}
+      <div className="mt-6 flex gap-6" role="tablist">
         {(["lesson", "quiz"] as const).map((m) => (
           <button
             key={m}
             onClick={() => switchMode(m)}
-            className={`rounded-full px-4 py-1.5 text-sm font-bold ${
-              (mode === m || (m === "lesson" && mode === "reteach")) ? "bg-grape text-white" : "border-2 border-grape/20 hover:bg-grape/10"
+            role="tab"
+            aria-selected={mode === m || (m === "lesson" && mode === "reteach")}
+            className={`-mb-px border-b-2 pb-3 text-sm font-medium transition-colors ${
+              (mode === m || (m === "lesson" && mode === "reteach")) ? "border-brand text-ink" : "border-transparent text-slate-500 hover:text-ink"
             }`}
           >
-            {m === "quiz" ? "🎯 Quiz" : "📖 Lesson"}
+            {m === "quiz" ? "Check understanding" : "Lesson"}
           </button>
         ))}
+      </div>
       </div>
       {mode === "quiz" ? (
         <TopicQuiz key="quiz" planId={id} topicId={topicId} onReteach={() => switchMode("reteach")} />
@@ -170,15 +175,15 @@ function Lesson({
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ topicId, kind, note, excerpt: excerpt.slice(0, 4000) }),
     }).catch(() => {});
-    setFeedbackSent(kind === "error" ? "Thanks, the error report was saved." : "Thanks for the feedback!");
+    setFeedbackSent(kind === "error" ? "Thanks, the error report was saved." : "Thanks for the feedback.");
     if (kind === "unclear") onReteach();
   }
 
   return (
     <div className="mt-6">
       {mode === "reteach" && (
-        <div className="mb-3 rounded-2xl bg-sunny/10 px-4 py-2 text-sm font-bold text-sunny">
-          🔄 Trying a different explanation, focused on what tripped you up.
+        <div className="mb-4 rounded-lg border border-sunny/20 bg-sunny/5 px-4 py-2.5 text-sm text-slate-700">
+          A different explanation, focused on the concepts you found difficult.
         </div>
       )}
       <div className="space-y-4">
@@ -188,58 +193,66 @@ function Lesson({
               {m.content}
             </div>
           ) : (
-            <div key={i} className="bubble-ai p-5">
+            <div key={i} className="card p-6 leading-relaxed">
               {m.content ? (
                 <Markdown
                   text={m.content}
                   onCite={(r) => setOpenSource(m.sources?.find((s) => s.ref === r) ?? null)}
                 />
               ) : (
-                <span className="text-ink/50">Thinking… ✨</span>
+                <span className="text-sm text-slate-500">Preparing the lesson…</span>
               )}
               {m.sources && m.sources.length > 0 && m.content && (
-                <details className="mt-4 rounded-xl bg-sky/5 p-3 text-sm">
-                  <summary className="cursor-pointer font-bold text-sky">📚 Sources from your materials ({m.sources.length})</summary>
+                <details className="mt-5 rounded-lg border border-line bg-slate-50 p-3 text-sm">
+                  <summary className="cursor-pointer font-medium text-slate-700">Sources from your materials ({m.sources.length})</summary>
                   <ul className="mt-2 space-y-2">
                     {m.sources.map((s) => (
                       <li key={s.ref}>
-                        <strong>[{s.ref}]</strong> {s.title}
+                        <span className="font-medium">[{s.ref}]</span> {s.title}
                         {s.page ? `, p. ${s.page}` : ""}
-                        <div className="text-ink/60">“{s.snippet}…”</div>
+                        <div className="text-slate-600">“{s.snippet}…”</div>
                       </li>
                     ))}
                   </ul>
                 </details>
               )}
               {m.sources && m.sources.length === 0 && m.content && !busy && (
-                <p className="mt-3 text-xs text-ink/40">
+                <p className="mt-3 text-xs text-slate-400">
                   No uploaded materials matched this topic, so this explanation is from general knowledge.
                 </p>
               )}
               {i === msgs.length - 1 && m.content && !busy && (
-                <div className="mt-4 flex flex-wrap gap-2 text-sm">
-                  <button onClick={() => sendFeedback("helpful", m.content)} className="rounded-full border-2 border-grape/15 px-3 py-1 hover:bg-grape/10">👍 Helpful</button>
-                  <button onClick={() => sendFeedback("unclear", m.content)} className="rounded-full border-2 border-grape/15 px-3 py-1 hover:bg-grape/10">🤔 Still confused</button>
-                  <button onClick={() => sendFeedback("error", m.content)} className="rounded-full border-2 border-grape/15 px-3 py-1 hover:bg-grape/10">🚩 Report an error</button>
+                <div className="mt-5 flex flex-wrap gap-2 border-t border-line pt-4 text-sm">
+                  <button onClick={() => sendFeedback("helpful", m.content)} className="btn-secondary inline-flex items-center gap-1.5 px-3 py-1.5 font-medium">
+                    <ThumbsUp className="h-3.5 w-3.5" /> Helpful
+                  </button>
+                  <button onClick={() => sendFeedback("unclear", m.content)} className="btn-secondary inline-flex items-center gap-1.5 px-3 py-1.5 font-medium">
+                    <HelpCircle className="h-3.5 w-3.5" /> Explain differently
+                  </button>
+                  <button onClick={() => sendFeedback("error", m.content)} className="btn-secondary inline-flex items-center gap-1.5 px-3 py-1.5 font-medium">
+                    <Flag className="h-3.5 w-3.5" /> Report an error
+                  </button>
                 </div>
               )}
             </div>
           )
         )}
       </div>
-      {feedbackSent && <p className="mt-2 text-sm font-bold text-mint">{feedbackSent}</p>}
-      {error && <p className="mt-3 font-bold text-bubblegum">{error}</p>}
+      {feedbackSent && <p className="mt-2 text-sm text-mint">{feedbackSent}</p>}
+      {error && <p className="mt-3 font-medium text-bubblegum">{error}</p>}
 
       {openSource && (
-        <div className="card mt-4 border-sky/30 p-4 text-sm">
+        <div className="card mt-4 p-4 text-sm">
           <div className="flex justify-between">
-            <strong>
+            <span className="font-medium">
               [{openSource.ref}] {openSource.title}
               {openSource.page ? `, page ${openSource.page}` : ""}
-            </strong>
-            <button onClick={() => setOpenSource(null)} className="text-ink/40">✕</button>
+            </span>
+            <button onClick={() => setOpenSource(null)} aria-label="Close source" className="rounded p-0.5 text-slate-400 hover:bg-slate-100">
+              <X className="h-4 w-4" />
+            </button>
           </div>
-          <p className="mt-2 text-ink/70">“{openSource.snippet}…”</p>
+          <p className="mt-2 text-slate-600">“{openSource.snippet}…”</p>
         </div>
       )}
 
@@ -248,14 +261,18 @@ function Lesson({
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="Ask a follow-up question…"
-          className="flex-1 rounded-full border-2 border-grape/15 bg-white px-4 py-2.5 outline-none focus:border-grape"
+          className="input flex-1"
           disabled={busy}
         />
-        <button disabled={busy || !input.trim()} className="btn-primary px-5">Ask</button>
+        <button disabled={busy || !input.trim()} className="btn-primary px-5 text-sm">Ask</button>
       </form>
-      <div className="mt-6 text-center">
-        <button onClick={onQuiz} disabled={busy} className="btn-primary px-6 py-3">
-          I&apos;m ready, quiz me 🎯
+      <div className="card mt-6 flex flex-col items-start justify-between gap-3 p-5 sm:flex-row sm:items-center">
+        <div>
+          <div className="font-medium">Ready to check your understanding?</div>
+          <div className="text-sm text-slate-500">A short quiz updates your mastery estimate for this topic.</div>
+        </div>
+        <button onClick={onQuiz} disabled={busy} className="btn-primary inline-flex shrink-0 items-center gap-1.5 px-4 py-2 text-sm">
+          Take the quiz <ArrowRight className="h-4 w-4" />
         </button>
       </div>
       <div ref={endRef} />
@@ -337,10 +354,10 @@ function TopicQuiz({ planId, topicId, onReteach }: { planId: string; topicId: st
     }
   }
 
-  if (busy && !quiz) return <p className="mt-8 text-center text-ink/50">Writing questions from your materials… ✍️</p>;
+  if (busy && !quiz) return <p className="mt-8 text-center text-slate-500">Writing questions from your materials…</p>;
   if (error && !quiz) return (
     <div className="mt-8 text-center">
-      <p className="font-bold text-bubblegum">{error}</p>
+      <p className="font-medium text-bubblegum">{error}</p>
       <button onClick={generate} className="btn-primary mt-3 px-5 py-2">Try again</button>
     </div>
   );
@@ -348,42 +365,46 @@ function TopicQuiz({ planId, topicId, onReteach }: { planId: string; topicId: st
 
   return (
     <div className="mt-6 space-y-4">
-      <p className="text-sm text-ink/50">Difficulty: {quiz.difficulty} (adapts to your mastery)</p>
+      <p className="text-sm text-slate-500">
+        {quiz.questions.length} questions · <span className="capitalize">{quiz.difficulty}</span> difficulty, adjusted to your current mastery
+      </p>
       {quiz.questions.map((q, i) => {
         const r = grade?.results[i];
         return (
           <div key={i} className="card p-5">
-            <div className="font-bold">
-              {i + 1}. {q.question}
+            <div className="flex gap-3 font-medium">
+              <span className="tabular-nums text-slate-400">{i + 1}.</span>
+              <span>{q.question}</span>
             </div>
             <div className="mt-3 grid gap-2">
               {q.options.map((o, j) => {
                 const picked = answers[i] === j;
-                let cls = "border-grape/15 hover:bg-grape/5";
+                let cls = "border-line hover:bg-slate-50";
                 if (r) {
                   if (j === r.answerIndex) cls = "border-mint bg-mint/10";
                   else if (picked) cls = "border-bubblegum bg-bubblegum/10";
-                  else cls = "border-grape/10 opacity-60";
-                } else if (picked) cls = "border-grape bg-grape/10";
+                  else cls = "border-line opacity-60";
+                } else if (picked) cls = "border-brand bg-brand/5 ring-1 ring-brand";
                 return (
                   <button
                     key={j}
                     disabled={!!grade}
                     onClick={() => setAnswers((a) => a.map((x, k) => (k === i ? j : x)))}
-                    className={`rounded-2xl border-2 px-4 py-2 text-left ${cls}`}
+                    className={`flex items-start gap-3 rounded-lg border px-4 py-2.5 text-left text-sm transition-colors ${cls}`}
                   >
-                    {o}
+                    <span className="font-medium text-slate-400">{String.fromCharCode(65 + j)}</span>
+                    <span>{o}</span>
                   </button>
                 );
               })}
             </div>
             {r && (
-              <div className={`mt-3 rounded-xl p-3 text-sm ${r.correct ? "bg-mint/10" : "bg-sunny/10"}`}>
-                <strong>{r.correct ? "✅ Correct." : "Not quite."}</strong> {r.explanation}
-                <div className="mt-1 text-xs text-ink/50">Concept: {r.concept}</div>
+              <div className={`mt-3 rounded-lg border-l-2 bg-slate-50 p-3 text-sm ${r.correct ? "border-mint" : "border-bubblegum"}`}>
+                <span className={`font-medium ${r.correct ? "text-mint" : "text-bubblegum"}`}>{r.correct ? "Correct." : "Incorrect."}</span> {r.explanation}
+                <div className="mt-1 text-xs text-slate-500">Concept: {r.concept}</div>
                 {r.source && (
-                  <div className="mt-2 text-xs text-ink/60">
-                    📚 From [{r.source.ref}] {r.source.title}
+                  <div className="mt-2 text-xs text-slate-600">
+                    From [{r.source.ref}] {r.source.title}
                     {r.source.page ? `, p. ${r.source.page}` : ""}: “{r.source.snippet.slice(0, 200)}…”
                   </div>
                 )}
@@ -392,35 +413,47 @@ function TopicQuiz({ planId, topicId, onReteach }: { planId: string; topicId: st
           </div>
         );
       })}
-      {error && <p className="font-bold text-bubblegum">{error}</p>}
+      {error && <p className="font-medium text-bubblegum">{error}</p>}
       {!grade ? (
-        <button onClick={submit} disabled={busy || answers.some((a) => a < 0)} className="btn-primary w-full py-3">
+        <button onClick={submit} disabled={busy || answers.some((a) => a < 0)} className="btn-primary w-full py-2.5">
           {busy ? "Checking…" : answers.some((a) => a < 0) ? "Answer every question to submit" : "Submit answers"}
         </button>
       ) : (
-        <div className="card bg-gradient-to-r from-grape/10 to-bubblegum/10 p-6 text-center">
-          <div className="text-4xl font-extrabold">
-            {grade.score}/{grade.total}
+        <div className="card p-6">
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <div className="eyebrow">Result</div>
+              <div className="mt-1 text-3xl font-semibold tabular-nums tracking-tight">
+                {grade.score}/{grade.total}
+              </div>
+            </div>
+            <div className="text-right">
+              <div className="eyebrow">Mastery estimate</div>
+              <div className="mt-1 text-3xl font-semibold tabular-nums tracking-tight">{Math.round(grade.outcome.mastery * 100)}%</div>
+            </div>
           </div>
-          <div className="mt-1 text-ink/70">Mastery estimate now {Math.round(grade.outcome.mastery * 100)}%</div>
           {grade.outcome.decision === "advance" ? (
-            <p className="mt-3 font-bold text-mint">🎉 Topic mastered! Review scheduled for {new Date(grade.outcome.nextReviewAt).toLocaleDateString()}.</p>
+            <p className="mt-4 text-sm text-slate-700">
+              <span className="font-medium text-mint">Topic mastered.</span> A review is scheduled for{" "}
+              {new Date(grade.outcome.nextReviewAt).toLocaleDateString()}.
+            </p>
           ) : (
-            <p className="mt-3 font-bold text-sunny">
-              Let&apos;s strengthen this one{grade.outcome.weakConcepts.length ? `: ${grade.outcome.weakConcepts.join(", ")}` : ""}.
+            <p className="mt-4 text-sm text-slate-700">
+              <span className="font-medium text-sunny">More practice recommended.</span>
+              {grade.outcome.weakConcepts.length ? ` Focus on: ${grade.outcome.weakConcepts.join(", ")}.` : ""}
             </p>
           )}
-          <div className="mt-4 flex flex-wrap justify-center gap-3">
+          <div className="mt-5 flex flex-wrap gap-2 border-t border-line pt-5">
             {grade.outcome.decision === "reteach" && (
-              <button onClick={onReteach} className="btn-primary px-5 py-2.5">Explain it another way 🔄</button>
+              <button onClick={onReteach} className="btn-primary px-4 py-2 text-sm">Revisit the lesson</button>
             )}
             {grade.nextStep.kind !== "done" && grade.nextStep.topicId && grade.nextStep.topicId !== topicId && (
-              <Link href={`/plan/${planId}/topic/${grade.nextStep.topicId}?mode=${grade.nextStep.kind === "learn" ? "lesson" : grade.nextStep.kind === "reteach" ? "reteach" : "quiz"}`} className="btn-primary px-5 py-2.5">
-                Next: {grade.nextStep.title} →
+              <Link href={`/plan/${planId}/topic/${grade.nextStep.topicId}?mode=${grade.nextStep.kind === "learn" ? "lesson" : grade.nextStep.kind === "reteach" ? "reteach" : "quiz"}`} className="btn-primary inline-flex items-center gap-1.5 px-4 py-2 text-sm">
+                Next: {grade.nextStep.title} <ArrowRight className="h-4 w-4" />
               </Link>
             )}
-            <button onClick={generate} className="rounded-full border-2 border-grape/20 px-5 py-2.5 font-bold hover:bg-grape/10">New quiz</button>
-            <Link href={`/plan/${planId}`} className="rounded-full border-2 border-grape/20 px-5 py-2.5 font-bold hover:bg-grape/10">Back to plan</Link>
+            <button onClick={generate} className="btn-secondary px-4 py-2 text-sm">New quiz</button>
+            <Link href={`/plan/${planId}`} className="btn-secondary px-4 py-2 text-sm">Back to plan</Link>
           </div>
         </div>
       )}

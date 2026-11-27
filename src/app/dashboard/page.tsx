@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { ArrowRight } from "lucide-react";
+import { PageHeader } from "@/components/PageHeader";
 
 type Progress = {
   signedIn: boolean;
@@ -21,6 +23,16 @@ type Progress = {
   };
 };
 
+function Stat({ label, value, hint }: { label: string; value: string | number; hint?: string }) {
+  return (
+    <div className="card p-5">
+      <div className="text-sm text-slate-500">{label}</div>
+      <div className="mt-1 text-2xl font-semibold tabular-nums tracking-tight">{value}</div>
+      {hint && <div className="mt-0.5 text-xs text-slate-500">{hint}</div>}
+    </div>
+  );
+}
+
 export default function DashboardPage() {
   const [data, setData] = useState<Progress | null>(null);
   const [loading, setLoading] = useState(true);
@@ -34,172 +46,189 @@ export default function DashboardPage() {
   }, []);
 
   if (loading) {
-    return <div className="pt-20 text-center text-ink/50">Loading your progress… ⏳</div>;
+    return <div className="pt-24 text-center text-sm text-slate-500">Loading progress…</div>;
   }
 
   if (!data?.signedIn) {
     return (
-      <div className="card mx-auto mt-16 max-w-md p-8 text-center">
-        <div className="text-5xl">🔐</div>
-        <h1 className="mt-3 text-2xl font-extrabold">Sign in to see your progress</h1>
-        <p className="mt-2 text-ink/60">
-          Track your streak, XP, quiz scores and flashcard reviews — free with a
-          Google account.
+      <div className="card mx-auto mt-20 max-w-md p-8 text-center">
+        <h1 className="text-xl font-semibold tracking-tight">Sign in to see your progress</h1>
+        <p className="mt-2 text-slate-600">
+          Topic mastery, knowledge gaps, quiz results and review schedules are saved to your account.
         </p>
       </div>
     );
   }
 
-  const level = Math.floor(Math.sqrt(data.xp / 25)) + 1;
+  const { learning } = data;
   const usageRows = [
-    { label: "💬 Tutor messages", used: data.today.chatMessages, max: data.limits.chatMessages },
-    { label: "📸 Photo solves", used: data.today.solves, max: data.limits.solves },
-    { label: "🎯 Quizzes", used: data.today.quizzes, max: data.limits.quizzes },
-    { label: "🃏 Decks", used: data.today.decks, max: data.limits.decks },
+    { label: "Tutor messages", used: data.today.chatMessages, max: data.limits.chatMessages },
+    { label: "Photo solves", used: data.today.solves, max: data.limits.solves },
+    { label: "Quizzes", used: data.today.quizzes, max: data.limits.quizzes },
+    { label: "Flashcard decks", used: data.today.decks, max: data.limits.decks },
   ];
 
   return (
-    <div className="mx-auto max-w-3xl pt-8">
-      <h1 className="text-3xl font-extrabold">
-        Hey {data.name?.split(" ")[0] ?? "there"}! <span className="gradient-text">Here&apos;s your progress</span>
-      </h1>
+    <div className="mx-auto max-w-5xl">
+      <PageHeader
+        eyebrow="Progress"
+        title={data.name ? `${data.name.split(" ")[0]}'s progress` : "Your progress"}
+        description="Mastery and knowledge gaps come from topic quizzes in your study plans."
+        actions={
+          <Link href="/plan" className="btn-secondary inline-flex items-center gap-1.5 px-4 py-2 text-sm">
+            Study plans <ArrowRight className="h-4 w-4" />
+          </Link>
+        }
+      />
 
-      <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
-        <div className="card p-5 text-center">
-          <div className="text-3xl">🔥</div>
-          <div className="mt-1 text-2xl font-extrabold">{data.streak}</div>
-          <div className="text-sm text-ink/50">day streak</div>
-        </div>
-        <div className="card p-5 text-center">
-          <div className="text-3xl">⭐</div>
-          <div className="mt-1 text-2xl font-extrabold">{data.xp}</div>
-          <div className="text-sm text-ink/50">XP · level {level}</div>
-        </div>
-        <div className="card p-5 text-center">
-          <div className="text-3xl">🎯</div>
-          <div className="mt-1 text-2xl font-extrabold">{data.counts.quizzes}</div>
-          <div className="text-sm text-ink/50">quizzes taken</div>
-        </div>
-        <div className="card p-5 text-center">
-          <div className="text-3xl">🃏</div>
-          <div className="mt-1 text-2xl font-extrabold">{data.counts.dueCards}</div>
-          <div className="text-sm text-ink/50">cards due</div>
-        </div>
+      <div className="mt-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <Stat label="Topics mastered" value={`${learning.mastered}/${learning.topics}`} />
+        <Stat
+          label="Average mastery"
+          value={learning.avgMastery === null ? "–" : `${Math.round(learning.avgMastery * 100)}%`}
+          hint="Across assessed topics"
+        />
+        <Stat label="Quizzes taken" value={data.counts.quizzes} />
+        <Stat label="Study streak" value={`${data.streak} ${data.streak === 1 ? "day" : "days"}`} />
       </div>
 
-      {data.counts.dueCards > 0 && (
-        <Link
-          href="/flashcards"
-          className="card mt-4 block bg-gradient-to-r from-bubblegum/10 to-sunny/10 p-4 text-center font-bold hover:shadow-lg"
-        >
-          ✨ {data.counts.dueCards} flashcards are ready for review — keep that streak alive!
-        </Link>
-      )}
-
-      <div className="card mt-6 p-6">
-        <div className="flex items-center justify-between">
-          <h2 className="text-xl font-bold">🗺️ Learning plans</h2>
-          <Link href="/plan" className="text-sm font-bold text-grape underline">Open plans</Link>
-        </div>
-        {data.learning.topics === 0 ? (
-          <p className="mt-2 text-ink/50">
-            No plan yet.{" "}
-            <Link href="/plan" className="font-bold text-grape underline">Build one from your goal</Link>{" "}
-            to get a roadmap, lessons from your notes and knowledge-gap tracking.
-          </p>
-        ) : (
-          <>
-            <p className="mt-2 text-ink/70">
-              {data.learning.mastered}/{data.learning.topics} topics mastered
-              {data.learning.avgMastery !== null && ` · average mastery ${Math.round(data.learning.avgMastery * 100)}%`}
-            </p>
-            {data.learning.reviewsDue.length > 0 && (
-              <div className="mt-4">
-                <h3 className="font-bold">⏰ Due for revision</h3>
-                <ul className="mt-1 space-y-1 text-sm">
-                  {data.learning.reviewsDue.map((r) => (
-                    <li key={r.topicId}>
-                      <Link href={`/plan/${r.planId}/topic/${r.topicId}?mode=quiz`} className="font-bold text-grape underline">{r.title}</Link>
-                      <span className="text-ink/50"> · {r.goal}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-            <div className="mt-4">
-              <h3 className="font-bold">🧩 Knowledge gaps</h3>
-              {data.learning.gaps.length === 0 ? (
-                <p className="text-sm text-ink/50">None spotted yet. Gaps appear here after topic quizzes.</p>
-              ) : (
-                <ul className="mt-1 space-y-2">
-                  {data.learning.gaps.map((g) => (
-                    <li key={g.topicId} className="rounded-2xl border-2 border-grape/10 px-4 py-2 text-sm">
-                      <div className="flex justify-between gap-2">
-                        <Link href={`/plan/${g.planId}/topic/${g.topicId}?mode=reteach`} className="font-bold text-grape underline">{g.title}</Link>
-                        <span className="shrink-0 font-bold text-sunny">{Math.round(g.mastery * 100)}%</span>
-                      </div>
-                      {g.weakConcepts.length > 0 && <div className="text-ink/60">{g.weakConcepts.join(", ")}</div>}
-                    </li>
-                  ))}
-                </ul>
-              )}
+      <div className="mt-6 grid gap-6 lg:grid-cols-[1.4fr_1fr]">
+        <section className="card">
+          <div className="border-b border-line px-5 py-4">
+            <h2 className="font-semibold">Knowledge gaps</h2>
+            <p className="text-sm text-slate-500">Topics and concepts to revisit, weakest first.</p>
+          </div>
+          {learning.topics === 0 ? (
+            <div className="px-5 py-8 text-sm text-slate-600">
+              You don&apos;t have a study plan yet.{" "}
+              <Link href="/plan" className="font-medium text-brand hover:underline">
+                Create one from your goal
+              </Link>{" "}
+              to start tracking mastery.
             </div>
-          </>
-        )}
-      </div>
+          ) : learning.gaps.length === 0 ? (
+            <div className="px-5 py-8 text-sm text-slate-500">No gaps identified yet. They appear after topic quizzes.</div>
+          ) : (
+            <ul className="divide-y divide-line">
+              {learning.gaps.map((g) => (
+                <li key={g.topicId} className="px-5 py-3.5">
+                  <div className="flex items-center justify-between gap-3">
+                    <Link
+                      href={`/plan/${g.planId}/topic/${g.topicId}?mode=reteach`}
+                      className="truncate text-sm font-medium hover:text-brand"
+                    >
+                      {g.title}
+                    </Link>
+                    <span className="shrink-0 text-sm tabular-nums text-sunny">{Math.round(g.mastery * 100)}%</span>
+                  </div>
+                  <div className="mt-0.5 truncate text-xs text-slate-500">
+                    {g.weakConcepts.length ? g.weakConcepts.join(" · ") : g.goal}
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
 
-      <div className="card mt-6 p-6">
-        <h2 className="text-xl font-bold">Today&apos;s free usage</h2>
-        <div className="mt-4 space-y-3">
-          {usageRows.map((r) => (
-            <div key={r.label}>
-              <div className="mb-1 flex justify-between text-sm font-bold">
-                <span>{r.label}</span>
-                <span className="text-ink/50">
-                  {r.used} / {r.max}
-                </span>
-              </div>
-              <div className="h-2.5 overflow-hidden rounded-full bg-grape/10">
-                <div
-                  className="h-full rounded-full bg-gradient-to-r from-grape to-bubblegum"
-                  style={{ width: `${Math.min(100, (r.used / r.max) * 100)}%` }}
-                />
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div className="card mt-6 p-6">
-        <h2 className="text-xl font-bold">Recent quiz results</h2>
-        {data.recentAttempts.length === 0 ? (
-          <p className="mt-2 text-ink/50">
-            No quizzes yet —{" "}
-            <Link href="/quiz" className="font-bold text-grape underline">
-              take your first one!
+        <section className="card">
+          <div className="border-b border-line px-5 py-4">
+            <h2 className="font-semibold">Due for review</h2>
+            <p className="text-sm text-slate-500">Spaced revision keeps mastered topics fresh.</p>
+          </div>
+          {learning.reviewsDue.length === 0 ? (
+            <div className="px-5 py-8 text-sm text-slate-500">Nothing due right now.</div>
+          ) : (
+            <ul className="divide-y divide-line">
+              {learning.reviewsDue.map((r) => (
+                <li key={r.topicId} className="flex items-center justify-between gap-3 px-5 py-3.5">
+                  <div className="min-w-0">
+                    <div className="truncate text-sm font-medium">{r.title}</div>
+                    <div className="truncate text-xs text-slate-500">{r.goal}</div>
+                  </div>
+                  <Link
+                    href={`/plan/${r.planId}/topic/${r.topicId}?mode=quiz`}
+                    className="btn-secondary shrink-0 px-3 py-1.5 text-sm"
+                  >
+                    Review
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
+          {data.counts.dueCards > 0 && (
+            <Link
+              href="/flashcards"
+              className="flex items-center justify-between border-t border-line px-5 py-3.5 text-sm hover:bg-slate-50"
+            >
+              <span>
+                {data.counts.dueCards} flashcard{data.counts.dueCards === 1 ? "" : "s"} due
+              </span>
+              <ArrowRight className="h-4 w-4 text-slate-400" />
             </Link>
-          </p>
-        ) : (
-          <ul className="mt-3 space-y-2">
-            {data.recentAttempts.map((a, i) => (
-              <li
-                key={i}
-                className="flex items-center justify-between rounded-2xl border-2 border-grape/10 px-4 py-2.5"
-              >
-                <span className="truncate font-semibold">{a.topic}</span>
-                <span
-                  className={`ml-3 shrink-0 rounded-full px-3 py-0.5 text-sm font-bold ${
-                    a.score / a.total >= 0.7
-                      ? "bg-mint/15 text-mint"
-                      : "bg-sunny/15 text-sunny"
-                  }`}
-                >
-                  {a.score}/{a.total}
-                </span>
-              </li>
+          )}
+        </section>
+      </div>
+
+      <div className="mt-6 grid gap-6 lg:grid-cols-[1.4fr_1fr]">
+        <section className="card">
+          <div className="border-b border-line px-5 py-4">
+            <h2 className="font-semibold">Recent quiz results</h2>
+          </div>
+          {data.recentAttempts.length === 0 ? (
+            <div className="px-5 py-8 text-sm text-slate-500">
+              No quizzes yet.{" "}
+              <Link href="/quiz" className="font-medium text-brand hover:underline">
+                Take a practice quiz
+              </Link>
+              .
+            </div>
+          ) : (
+            <table className="w-full table-fixed text-sm">
+              <colgroup>
+                <col />
+                <col className="w-28" />
+                <col className="w-16" />
+              </colgroup>
+              <tbody className="divide-y divide-line">
+                {data.recentAttempts.map((a, i) => (
+                  <tr key={i}>
+                    <td className="truncate px-5 py-3">{a.topic}</td>
+                    <td className="py-3 text-right text-slate-500">{new Date(a.at).toLocaleDateString()}</td>
+                    <td
+                      className={`px-5 py-3 text-right font-medium tabular-nums ${
+                        a.score / a.total >= 0.7 ? "text-mint" : "text-sunny"
+                      }`}
+                    >
+                      {a.score}/{a.total}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </section>
+
+        <section className="card p-5">
+          <h2 className="font-semibold">Today&apos;s usage</h2>
+          <div className="mt-4 space-y-3.5">
+            {usageRows.map((r) => (
+              <div key={r.label}>
+                <div className="mb-1 flex justify-between text-sm">
+                  <span className="text-slate-600">{r.label}</span>
+                  <span className="tabular-nums text-slate-500">
+                    {r.used} / {r.max}
+                  </span>
+                </div>
+                <div className="h-1.5 rounded-full bg-slate-100">
+                  <div
+                    className="h-full rounded-full bg-brand"
+                    style={{ width: `${Math.min(100, (r.used / r.max) * 100)}%` }}
+                  />
+                </div>
+              </div>
             ))}
-          </ul>
-        )}
+          </div>
+        </section>
       </div>
     </div>
   );
