@@ -23,7 +23,7 @@ export type TopicState = {
  * Recent evidence counts more, but one lucky quiz can't jump a topic to 100%.
  */
 export function updateMastery(prev: number, attempts: number, accuracy: number): number {
-  const weight = attempts === 0 ? 0.7 : 0.6;
+  const weight = attempts === 0 ? 0.8 : 0.6;
   return Math.round((prev * (1 - weight) + accuracy * weight) * 100) / 100;
 }
 

@@ -43,7 +43,7 @@ export function toTopicState(t: PlanTopic): TopicState {
 
 export function limitResponse(what: string) {
   return Response.json(
-    { error: `You've reached today's ${what} limit. Come back tomorrow! 🌙`, limitReached: true },
+    { error: `You've reached today's ${what} limit. It resets at midnight UTC.`, limitReached: true },
     { status: 429 }
   );
 }

@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { ChevronRight } from "lucide-react";
+import { PageHeader } from "@/components/PageHeader";
 
 type PlanRow = {
   id: string;
@@ -77,9 +79,8 @@ export default function PlansPage() {
   if (!signedIn) {
     return (
       <div className="card mx-auto mt-16 max-w-md p-8 text-center">
-        <div className="text-5xl">🗺️</div>
-        <h1 className="mt-3 text-2xl font-extrabold">Sign in to build a learning plan</h1>
-        <p className="mt-2 text-ink/60">
+        <h1 className=" text-2xl font-semibold tracking-tight">Sign in to build a learning plan</h1>
+        <p className="mt-2 text-slate-600">
           Plans, uploaded notes and your progress are saved to your account, so you need to sign in first.
         </p>
       </div>
@@ -87,33 +88,72 @@ export default function PlansPage() {
   }
 
   return (
-    <div className="mx-auto max-w-3xl pt-8">
-      <h1 className="text-3xl font-extrabold">
-        🗺️ <span className="gradient-text">Learning plans</span>
-      </h1>
-      <p className="mt-1 text-ink/60">
-        Tell SuperTutor what you want to learn. It builds a roadmap, teaches each topic from your own notes,
-        checks your understanding and adapts what comes next.
-      </p>
+    <div>
+      <PageHeader
+        eyebrow="Study plans"
+        title="Study plans"
+        description="Describe what you want to learn. SuperTutor builds a topic roadmap, teaches each topic from your materials, checks understanding and adapts what comes next."
+      />
 
-      <form onSubmit={create} className="card mt-6 space-y-4 p-6">
+      <div className="mt-8 grid items-start gap-8 lg:grid-cols-[1fr_420px]">
+      <section className="order-2 lg:order-1">
+      <h2 className="font-semibold">Your plans</h2>
+      {plans === null ? (
+        <p className="mt-3 text-sm text-slate-500">Loading…</p>
+      ) : plans.length === 0 ? (
+        <div className="card mt-3 border-dashed p-8 text-center text-sm text-slate-500">
+          No plans yet. Create your first one with the form.
+        </div>
+      ) : (
+        <ul className="card mt-3 divide-y divide-line">
+          {plans.map((p) => (
+            <li key={p.id}>
+              <Link href={`/plan/${p.id}`} className="group flex items-center gap-4 px-5 py-4 hover:bg-slate-50">
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="truncate font-medium">{p.goal}</span>
+                    <span className="shrink-0 text-xs tabular-nums text-slate-500">
+                      {p.mastered}/{p.topicCount} mastered
+                    </span>
+                  </div>
+                  <div className="mt-2 h-1.5 rounded-full bg-slate-100">
+                    <div
+                      className="h-full rounded-full bg-brand"
+                      style={{ width: `${p.topicCount ? (p.mastered / p.topicCount) * 100 : 0}%` }}
+                    />
+                  </div>
+                  <p className="mt-2 truncate text-sm text-slate-500">
+                    Next: {p.nextStep.title ? <span className="text-slate-700">{p.nextStep.title}</span> : null}{" "}
+                    {p.nextStep.title ? "" : p.nextStep.reason}
+                  </p>
+                </div>
+                <ChevronRight className="h-4 w-4 shrink-0 text-slate-300 group-hover:text-slate-500" />
+              </Link>
+            </li>
+          ))}
+        </ul>
+      )}
+      </section>
+
+      <form onSubmit={create} className="card order-1 space-y-4 p-6 lg:order-2">
+        <h2 className="font-semibold">New plan</h2>
         <label className="block">
-          <span className="font-bold">What&apos;s your goal?</span>
+          <span className="text-sm font-medium">Goal</span>
           <input
             value={goal}
             onChange={(e) => setGoal(e.target.value)}
-            placeholder="e.g. Learn Python for data analysis, or pass my CN7050 exam"
-            className="mt-1 w-full rounded-2xl border-2 border-grape/15 px-4 py-2.5 outline-none focus:border-grape"
+            placeholder="For example: pass my CN7050 Intelligent Systems exam"
+            className="input mt-1.5"
             maxLength={300}
           />
         </label>
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
           <label className="block">
-            <span className="font-bold">Current level</span>
+            <span className="text-sm font-medium">Current level</span>
             <select
               value={level}
               onChange={(e) => setLevel(e.target.value as (typeof LEVELS)[number])}
-              className="mt-1 w-full rounded-2xl border-2 border-grape/15 bg-white px-4 py-2.5"
+              className="input mt-1.5 capitalize"
             >
               {LEVELS.map((l) => (
                 <option key={l}>{l}</option>
@@ -121,11 +161,11 @@ export default function PlansPage() {
             </select>
           </label>
           <label className="block">
-            <span className="font-bold">Explanation style</span>
+            <span className="text-sm font-medium">Explanation style</span>
             <select
               value={style}
               onChange={(e) => setStyle(e.target.value as (typeof STYLES)[number])}
-              className="mt-1 w-full rounded-2xl border-2 border-grape/15 bg-white px-4 py-2.5"
+              className="input mt-1.5 capitalize"
             >
               {STYLES.map((s) => (
                 <option key={s}>{s}</option>
@@ -133,79 +173,50 @@ export default function PlansPage() {
             </select>
           </label>
           <label className="block">
-            <span className="font-bold">Hours per week</span>
+            <span className="text-sm font-medium">Hours per week</span>
             <input
               type="number"
               min={1}
               max={60}
               value={hours}
               onChange={(e) => setHours(Math.max(1, Math.min(60, Number(e.target.value) || 1)))}
-              className="mt-1 w-full rounded-2xl border-2 border-grape/15 px-4 py-2.5"
+              className="input mt-1.5"
             />
           </label>
           <label className="block">
-            <span className="font-bold">Target date (optional)</span>
+            <span className="text-sm font-medium">Target date (optional)</span>
             <input
               type="date"
               value={targetDate}
               onChange={(e) => setTargetDate(e.target.value)}
-              className="mt-1 w-full rounded-2xl border-2 border-grape/15 px-4 py-2.5"
+              className="input mt-1.5"
             />
           </label>
         </div>
         {showSyllabus ? (
           <label className="block">
-            <span className="font-bold">Syllabus or learning outcomes (optional)</span>
+            <span className="text-sm font-medium">Syllabus or learning outcomes (optional)</span>
             <textarea
               value={syllabus}
               onChange={(e) => setSyllabus(e.target.value)}
               rows={5}
               maxLength={20000}
               placeholder="Paste topic lists, module outcomes or exam objectives"
-              className="mt-1 w-full rounded-2xl border-2 border-grape/15 px-4 py-2.5"
+              className="input mt-1.5"
             />
           </label>
         ) : (
-          <button type="button" onClick={() => setShowSyllabus(true)} className="text-sm font-bold text-grape underline">
-            + Paste a syllabus or learning outcomes
+          <button type="button" onClick={() => setShowSyllabus(true)} className="text-sm font-medium text-brand hover:underline">
+            Add a syllabus or learning outcomes
           </button>
         )}
-        {error && <p className="font-bold text-bubblegum">{error}</p>}
-        <button disabled={busy || goal.trim().length < 3} className="btn-primary w-full py-3">
-          {busy ? "Planning your roadmap… (about 30 seconds)" : "✨ Build my plan"}
+        {error && <p className="text-sm text-bubblegum">{error}</p>}
+        <button disabled={busy || goal.trim().length < 3} className="btn-primary w-full py-2.5">
+          {busy ? "Building your plan… this takes about 30 seconds" : "Create plan"}
         </button>
       </form>
 
-      <h2 className="mt-10 text-xl font-bold">Your plans</h2>
-      {plans === null ? (
-        <p className="mt-2 text-ink/50">Loading…</p>
-      ) : plans.length === 0 ? (
-        <p className="mt-2 text-ink/50">No plans yet. Create your first one above.</p>
-      ) : (
-        <ul className="mt-3 space-y-3">
-          {plans.map((p) => (
-            <li key={p.id}>
-              <Link href={`/plan/${p.id}`} className="card block p-5 hover:shadow-lg">
-                <div className="flex items-center justify-between gap-3">
-                  <span className="font-bold">{p.goal}</span>
-                  <span className="shrink-0 rounded-full bg-mint/15 px-3 py-0.5 text-sm font-bold text-mint">
-                    {p.mastered}/{p.topicCount} mastered
-                  </span>
-                </div>
-                <div className="mt-2 h-2 overflow-hidden rounded-full bg-grape/10">
-                  <div
-                    className="h-full rounded-full bg-gradient-to-r from-grape to-bubblegum"
-                    style={{ width: `${p.topicCount ? (p.mastered / p.topicCount) * 100 : 0}%` }}
-                  />
-                </div>
-                <p className="mt-2 text-sm text-ink/60">
-                  Next: {p.nextStep.title ? <strong>{p.nextStep.title}</strong> : null} {p.nextStep.reason}
-                </p>
-              </Link>
-            </li>
-          ))}
-        </ul>
-      )}
+      </div>
     </div>
   );
 }

@@ -57,8 +57,8 @@ export async function POST(req: NextRequest) {
     return Response.json(
       {
         error: userId
-          ? "You've reached today's free limit. Come back tomorrow! 🌙"
-          : "Guest limit reached — sign in with Google for a bigger free daily limit!",
+          ? "You've reached today's free limit. It resets at midnight UTC."
+          : "You have used the guest limit. Sign in with Google to continue.",
         limitReached: true,
       },
       { status: 429 }
@@ -145,13 +145,13 @@ export async function POST(req: NextRequest) {
         }
         const final = await stream.finalMessage();
         if (final.stop_reason === "refusal" && !full) {
-          const msg = "Hmm, I can't help with that one. Let's get back to learning! 📚";
+          const msg = "I can't help with that request. Let's return to your studies.";
           full = msg;
           controller.enqueue(encoder.encode(msg));
         }
       } catch {
         controller.enqueue(
-          encoder.encode("\n\n⚠️ Something went wrong. Please try again.")
+          encoder.encode("\n\nSomething went wrong. Please try again.")
         );
       } finally {
         controller.close();

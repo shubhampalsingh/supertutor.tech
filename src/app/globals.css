@@ -1,89 +1,132 @@
 @import "tailwindcss";
 
+/*
+ * SuperTutor design tokens.
+ * Legacy token names (grape, bubblegum, sunny, mint, sky, cream) are kept so
+ * existing utility classes resolve to the professional palette.
+ */
 @theme {
-  --color-ink: #2d2a4a;
-  --color-grape: #7c3aed;
-  --color-bubblegum: #ec4899;
-  --color-sunny: #f59e0b;
-  --color-mint: #10b981;
-  --color-sky: #0ea5e9;
-  --color-cream: #fff9f2;
-  --font-display: var(--font-baloo), "Comic Sans MS", cursive;
-  --font-body: var(--font-nunito), ui-rounded, system-ui, sans-serif;
+  --color-ink: #0f172a;        /* primary text (slate-900) */
+  --color-grape: #1d4ed8;      /* brand / primary action (blue-700) */
+  --color-brand: #1d4ed8;
+  --color-brand-dark: #1e3a8a;
+  --color-bubblegum: #b91c1c;  /* error / incorrect */
+  --color-sunny: #b45309;      /* warning / needs practice */
+  --color-mint: #047857;       /* success / mastered */
+  --color-sky: #0369a1;        /* info / sources */
+  --color-cream: #f8fafc;      /* page background */
+  --color-line: #e2e8f0;       /* borders */
+  --font-display: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-body: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 }
 
 body {
   background: var(--color-cream);
   color: var(--color-ink);
   font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  font-feature-settings: "cv11", "ss01";
 }
 
 h1, h2, h3, .display {
   font-family: var(--font-display);
+  letter-spacing: -0.02em;
 }
 
+/* Kept for compatibility: no gradient, just the heading colour. */
 .gradient-text {
-  background: linear-gradient(90deg, #7c3aed, #ec4899, #f59e0b);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: inherit;
 }
 
 .blob-bg {
-  background:
-    radial-gradient(600px 300px at 10% 0%, rgba(124, 58, 237, 0.12), transparent 70%),
-    radial-gradient(500px 300px at 90% 10%, rgba(236, 72, 153, 0.12), transparent 70%),
-    radial-gradient(600px 400px at 50% 100%, rgba(245, 158, 11, 0.1), transparent 70%),
-    #fff9f2;
+  background: var(--color-cream);
 }
 
 .card {
   background: white;
-  border-radius: 1.5rem;
-  border: 2px solid #f1e8f7;
-  box-shadow: 0 4px 20px rgba(124, 58, 237, 0.07);
+  border-radius: 0.75rem;
+  border: 1px solid var(--color-line);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
 }
 
 .btn-primary {
-  background: linear-gradient(90deg, #7c3aed, #ec4899);
+  background: var(--color-brand);
   color: white;
-  border-radius: 9999px;
-  font-weight: 800;
-  transition: transform 0.1s ease, box-shadow 0.15s ease;
-  box-shadow: 0 4px 14px rgba(236, 72, 153, 0.35);
+  border-radius: 0.5rem;
+  font-weight: 600;
+  transition: background-color 0.15s ease;
 }
 .btn-primary:hover:not(:disabled) {
-  transform: translateY(-2px) scale(1.02);
-  box-shadow: 0 6px 20px rgba(236, 72, 153, 0.45);
+  background: var(--color-brand-dark);
+}
+.btn-primary:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 2px;
 }
 .btn-primary:disabled {
-  opacity: 0.5;
+  opacity: 0.45;
   cursor: not-allowed;
 }
 
+.btn-secondary {
+  background: white;
+  color: var(--color-ink);
+  border: 1px solid var(--color-line);
+  border-radius: 0.5rem;
+  font-weight: 600;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+.btn-secondary:hover:not(:disabled) {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+.input {
+  width: 100%;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.5rem;
+  background: white;
+  padding: 0.625rem 0.875rem;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.input:focus {
+  border-color: var(--color-brand);
+  box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.15);
+}
+
+.eyebrow {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #64748b;
+}
+
 .bubble-user {
-  background: linear-gradient(135deg, #7c3aed, #a855f7);
+  background: var(--color-brand);
   color: white;
-  border-radius: 1.25rem 1.25rem 0.25rem 1.25rem;
+  border-radius: 0.75rem 0.75rem 0.25rem 0.75rem;
 }
 .bubble-ai {
   background: white;
-  border: 2px solid #f1e8f7;
-  border-radius: 1.25rem 1.25rem 1.25rem 0.25rem;
+  border: 1px solid var(--color-line);
+  border-radius: 0.75rem 0.75rem 0.75rem 0.25rem;
 }
 
-@keyframes bounce-slow {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-8px); }
-}
+/* Motion kept subtle; the old bounce is disabled. */
 .animate-bounce-slow {
-  animation: bounce-slow 2.5s ease-in-out infinite;
+  animation: none;
 }
 
-@keyframes pop-in {
-  from { opacity: 0; transform: scale(0.95) translateY(6px); }
-  to { opacity: 1; transform: scale(1) translateY(0); }
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 .animate-pop {
-  animation: pop-in 0.25s ease-out;
+  animation: fade-in 0.2s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-pop { animation: none; }
 }

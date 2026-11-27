@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { Check, X } from "lucide-react";
+import { PageHeader } from "@/components/PageHeader";
 
 type Question = {
   question: string;
@@ -36,7 +38,7 @@ export default function QuizPage() {
       });
       const data = await res.json();
       if (!res.ok) {
-        setError(data.error ?? "Quiz generation failed. Try again!");
+        setError(data.error ?? "Quiz generation failed. Please try again.");
         return;
       }
       setQuiz(data);
@@ -85,54 +87,56 @@ export default function QuizPage() {
   const q = quiz?.questions[current];
 
   return (
-    <div className="mx-auto max-w-2xl pt-6">
-      <h1 className="text-center text-3xl font-extrabold">
-        🎯 Quiz <span className="gradient-text">Me!</span>
-      </h1>
+    <div className="mx-auto max-w-2xl">
+      <PageHeader
+        eyebrow="Practice"
+        title="Practice quiz"
+        description="Generate multiple-choice questions on any topic. For quizzes that track mastery against your course materials, use a study plan."
+      />
 
       {!quiz && (
-        <form onSubmit={generate} className="card animate-pop mt-6 space-y-4 p-6">
+        <form onSubmit={generate} className="card animate-pop mt-6 space-y-5 p-6">
           <div>
-            <label className="mb-1 block font-bold">What do you want a quiz on?</label>
+            <label className="mb-1.5 block text-sm font-medium">What do you want a quiz on?</label>
             <input
               value={topic}
               onChange={(e) => setTopic(e.target.value)}
-              placeholder="e.g. Photosynthesis, World War 2, Python basics…"
-              className="w-full rounded-full border-2 border-grape/20 px-4 py-2.5 outline-none focus:border-grape/60"
+              placeholder="For example: photosynthesis, or SQL joins"
+              className="input"
             />
           </div>
           <div className="flex flex-wrap gap-4">
             <div>
-              <label className="mb-1 block font-bold">Difficulty</label>
+              <label className="mb-1.5 block text-sm font-medium">Difficulty</label>
               <div className="flex gap-2">
                 {(["easy", "medium", "hard"] as const).map((d) => (
                   <button
                     type="button"
                     key={d}
                     onClick={() => setDifficulty(d)}
-                    className={`rounded-full border-2 px-4 py-1.5 font-bold capitalize ${
+                    className={`rounded-md border px-3.5 py-1.5 text-sm font-medium capitalize ${
                       difficulty === d
-                        ? "border-grape bg-grape text-white"
-                        : "border-grape/20 bg-white text-ink/70"
+                        ? "border-brand bg-brand text-white"
+                        : "border-line bg-white text-slate-600 hover:border-slate-300"
                     }`}
                   >
-                    {d === "easy" ? "😊" : d === "medium" ? "🤔" : "🔥"} {d}
+                    {d}
                   </button>
                 ))}
               </div>
             </div>
             <div>
-              <label className="mb-1 block font-bold">Questions</label>
+              <label className="mb-1.5 block text-sm font-medium">Questions</label>
               <div className="flex gap-2">
                 {[5, 8, 10].map((n) => (
                   <button
                     type="button"
                     key={n}
                     onClick={() => setCount(n)}
-                    className={`rounded-full border-2 px-4 py-1.5 font-bold ${
+                    className={`rounded-md border px-3.5 py-1.5 text-sm font-medium ${
                       count === n
-                        ? "border-grape bg-grape text-white"
-                        : "border-grape/20 bg-white text-ink/70"
+                        ? "border-brand bg-brand text-white"
+                        : "border-line bg-white text-slate-600 hover:border-slate-300"
                     }`}
                   >
                     {n}
@@ -142,63 +146,63 @@ export default function QuizPage() {
             </div>
           </div>
           {error && (
-            <div className="rounded-2xl border-2 border-sunny/40 bg-sunny/10 px-4 py-2 text-sm font-bold">
+            <div className="rounded-lg border border-sunny/30 bg-sunny/5 px-4 py-2 text-sm">
               {error}
             </div>
           )}
-          <button disabled={busy || !topic.trim()} className="btn-primary w-full py-3 text-lg">
-            {busy ? "Cooking up your quiz… 🍳" : "Generate my quiz ✨"}
+          <button disabled={busy || !topic.trim()} className="btn-primary w-full py-2.5">
+            {busy ? "Generating questions…" : "Generate quiz"}
           </button>
         </form>
       )}
 
       {quiz && !done && q && (
         <div className="card animate-pop mt-6 p-6" key={current}>
-          <div className="mb-3 flex items-center justify-between text-sm font-bold text-ink/50">
+          <div className="mb-3 flex items-center justify-between text-sm font-bold text-slate-500">
             <span>{quiz.title}</span>
             <span>
               {current + 1} / {quiz.questions.length}
             </span>
           </div>
-          <div className="mb-4 h-2 overflow-hidden rounded-full bg-grape/10">
+          <div className="mb-4 h-2 overflow-hidden rounded-full bg-slate-100">
             <div
-              className="h-full rounded-full bg-gradient-to-r from-grape to-bubblegum transition-all"
+              className="h-full rounded-full bg-brand transition-all"
               style={{ width: `${((current + 1) / quiz.questions.length) * 100}%` }}
             />
           </div>
           <h2 className="text-xl font-bold">{q.question}</h2>
           <div className="mt-4 space-y-2">
             {q.options.map((opt, i) => {
-              let style = "border-grape/20 bg-white hover:border-grape/60";
+              let style = "border-line bg-white hover:border-slate-400";
               if (picked !== null) {
                 if (i === q.answerIndex) style = "border-mint bg-mint/10";
                 else if (i === picked) style = "border-bubblegum bg-bubblegum/10";
-                else style = "border-grape/10 bg-white opacity-60";
+                else style = "border-line bg-white opacity-60";
               }
               return (
                 <button
                   key={i}
                   onClick={() => pick(i)}
                   disabled={picked !== null}
-                  className={`block w-full rounded-2xl border-2 px-4 py-3 text-left font-semibold transition ${style}`}
+                  className={`block w-full rounded-lg border px-4 py-3 text-left font-medium transition ${style}`}
                 >
                   <span className="mr-2">{String.fromCharCode(65 + i)}.</span>
                   {opt}
-                  {picked !== null && i === q.answerIndex && " ✅"}
-                  {picked !== null && i === picked && i !== q.answerIndex && " ❌"}
+                  {picked !== null && i === q.answerIndex && <Check className="ml-2 inline h-4 w-4 text-mint" />}
+                  {picked !== null && i === picked && i !== q.answerIndex && <X className="ml-2 inline h-4 w-4 text-bubblegum" />}
                 </button>
               );
             })}
           </div>
           {picked !== null && (
-            <div className="animate-pop mt-4 rounded-2xl bg-sky/10 px-4 py-3 text-ink/80">
-              <span className="font-bold">{picked === q.answerIndex ? "Nice one! 🎉" : "Good try!"}</span>{" "}
+            <div className="animate-pop mt-4 rounded-lg border border-line bg-slate-50 px-4 py-3 text-slate-700">
+              <span className="font-bold">{picked === q.answerIndex ? "Correct." : "Incorrect."}</span>{" "}
               {q.explanation}
             </div>
           )}
           {picked !== null && (
             <button onClick={next} className="btn-primary mt-4 w-full py-3">
-              {current + 1 < quiz.questions.length ? "Next question →" : "See my score 🏁"}
+              {current + 1 < quiz.questions.length ? "Next question →" : "See results"}
             </button>
           )}
         </div>
@@ -206,18 +210,16 @@ export default function QuizPage() {
 
       {quiz && done && (
         <div className="card animate-pop mt-6 p-8 text-center">
-          <div className="text-6xl">
-            {score === quiz.questions.length ? "🏆" : score >= quiz.questions.length / 2 ? "🎉" : "💪"}
-          </div>
-          <h2 className="mt-3 text-3xl font-extrabold">
+          
+          <h2 className="mt-3 text-3xl font-semibold tracking-tight">
             {score} / {quiz.questions.length}
           </h2>
-          <p className="mt-1 text-ink/60">
+          <p className="mt-1 text-slate-600">
             {score === quiz.questions.length
-              ? "Perfect score! You're on fire!"
+              ? "Every question correct."
               : score >= quiz.questions.length / 2
-                ? "Great work — keep practicing!"
-                : "Every attempt makes you stronger. Try again!"}
+                ? "Good result. Review the explanations for the ones you missed."
+                : "Review the explanations, then try again."}
           </p>
           <div className="mt-5 flex justify-center gap-3">
             <button
@@ -227,7 +229,7 @@ export default function QuizPage() {
               }}
               className="btn-primary px-6 py-2.5"
             >
-              New quiz ✨
+              New quiz
             </button>
             <button
               onClick={() => {
@@ -237,9 +239,9 @@ export default function QuizPage() {
                 setScore(0);
                 setDone(false);
               }}
-              className="rounded-full border-2 border-grape/30 bg-white px-6 py-2.5 font-bold text-grape"
+              className="btn-secondary px-6 py-2.5"
             >
-              Retry 🔁
+              Retry
             </button>
           </div>
         </div>

@@ -57,8 +57,8 @@ export async function POST(req: NextRequest) {
     return Response.json(
       {
         error: userId
-          ? "You've reached today's quiz limit. Come back tomorrow! 🌙"
-          : "Guest limit reached — sign in with Google for more free quizzes!",
+          ? "You've reached today's quiz limit. It resets at midnight UTC."
+          : "You have used the guest limit. Sign in with Google to continue.",
         limitReached: true,
       },
       { status: 429 }
@@ -88,7 +88,7 @@ export async function POST(req: NextRequest) {
   });
 
   if (response.stop_reason === "refusal") {
-    return Response.json({ error: "That topic isn't something I can quiz on. Try another!" }, { status: 400 });
+    return Response.json({ error: "That topic isn't something I can quiz on. Please try a different topic." }, { status: 400 });
   }
 
   const text = response.content.find((b) => b.type === "text")?.text ?? "";

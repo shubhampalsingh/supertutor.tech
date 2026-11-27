@@ -1,25 +1,24 @@
 import { Chat } from "@/components/Chat";
+import { PageHeader } from "@/components/PageHeader";
 
-export const metadata = { title: "Photo Solver — SuperTutor" };
+export const metadata = { title: "Solve from a photo" };
 
 export default function SolvePage() {
   return (
-    <div className="pt-6">
-      <h1 className="text-center text-3xl font-extrabold">
-        📸 Photo <span className="gradient-text">Problem Solver</span>
-      </h1>
-      <p className="mb-4 mt-1 text-center text-ink/60">
-        Tap 📷, snap your homework problem, and get a step-by-step walkthrough.
-        You can ask follow-up questions too!
-      </p>
-      <Chat
-        mode="solve"
-        allowSubjects={false}
-        greeting={
-          "Send me a photo of any problem 📸\nMath, physics, chemistry, grammar — I'll break it down step by step."
-        }
-        placeholder="Attach a photo, or type the problem here…"
+    <div className="mx-auto max-w-3xl">
+      <PageHeader
+        eyebrow="Problem solver"
+        title="Solve from a photo"
+        description="Attach a photo of a problem, or type it out. You'll get a numbered walkthrough and can ask follow-up questions."
       />
+      <div className="pt-6">
+        <Chat
+          mode="solve"
+          allowSubjects={false}
+          greeting={"Attach a photo of a maths, science or language problem, or type it below."}
+          placeholder="Attach a photo, or type the problem"
+        />
+      </div>
     </div>
   );
 }
